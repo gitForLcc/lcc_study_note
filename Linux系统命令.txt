@@ -1,0 +1,473 @@
+http://v.xue.taobao.com/learn.htm?courseId=74059    （视频地址）  wifi密码： csce / 123567890jbgsn
+
+reboot
+批量修改内容： sed -i "s/启明星辰/胡门网络/g" `grep 启明星辰 -rl ./`
+
+1.ifconfig
+2.ifconfig ens33
+3.ifconfig ens33:0 192.168.1.1
+4.ifconfig ens33:0 del 192.168.1.1
+
+5.systemctl restart network
+6.systemctl status NetworkManager		#网络管理服务
+
+7.vim /etc/sysconfig/network-scripts/ifcfg-ens33		#ip地址等
+8.ls /etc/sysconfig/network-scripts/ifcfg-lo		#网卡回环地址
+9.cat /etc/resolv.conf		#DNS配置文件
+10.cat /etc/hosts		#设置主机和IP绑定信息
+11.cat /etc/hostname		#设置主机名
+
+12.nmtui
+
+13.systemctl status firewalld.service
+14.systemctl stop firewalld
+15.systemctl start firewalld
+16.systemctl disable firewalld		#开机自动关闭  //RHLE7
+17.systemctl enable firewalld
+
+18.getenforce		#临时和永久关闭Selinux
+19.setenforce 0
+20.vim /etc/selinux/config
+
+#设置系统光盘开机自动挂载
+21.vim /etc/fstab 	#在文档最后，添加以一下内容
+/dev/cdrom	/mnt	iso9660 defaults	0 0
+22.mount -a	->	ls /mnt/
+
+#配置本地YUM源
+23.[root@lcc yum.repos.d]# rm -rf /etc/yum.repo.d/*
+24.[root@lcc yum.repos.d]# vim CentOS7.repo
+[CentOS7]   #唯一
+name=CentOS-server     
+baseurl=file:///mnt  
+enabled=1  
+gpgcheck=0	#取消验证
+25.[root@localhost ~]# yum clean all
+26.[root@localhost ~]# yum list
+27.[root@lcc yum.repos.d]# yum -y install httpd
+
+28.tty
+29.echo licheng > /dev/pts/1
+30.shutdown +10
+31.shutdown -c
+32.wall  " The system will be shut down in 10 minutes "
+
+33.type cat
+34.cat /etc/shells	#查看shell类型
+35.head -1 /etc/passwd
+
+36.ls -l  -> ls -a  > ls -lS /root/
+第一个字符文件类型中：
+d：目录文件
+l：链接文件
+b：块设备文件
+c：字符设备文件
+p：管道文件
+-: 表示普通文件
+37.alias vimens33='vim /etc/sysconfig/network-scripts/ifcfg-ens33'
+38.unalisa vimens33
+39.vim /root/.bashrc		#插入以一下内容 , 别名永久生效 , 当前用户
+8 alias vimenss33="vim /etc/sysconfig/network-scripts/ifcfg-ens33"
+40.source /root/.bashrc
+41. vim /etc/bashrc   #在文件最后插入  ， 所有用户
+alias vimenss33="vim /etc/sysconfig/network-scripts/ifcfg-ens33"
+
+42.cd / history
+43.!$ 	#引用上一个命令的最后一个参数
+44.hwclock / date
+45.date -s "2018-11-2 22:30"
+46.[root@lcc ~]# date "+%F"   ->   date -d "+1 months" +%F
+2018-11-02
+
+%y	年份最后两位数位 (00-99)
+%Y	年份
+%m   month (01..12)
+%d	按月计的日期(例如：01)
+%M   minute (00..59)
+%H	小时(00-23)
+%S	秒(00-60)
+[root@lcc ~]# date "+%Y%m%d"    
+20181102
+[root@lcc ~]# date "+%Y-%m-%d %H:%M:%S"    #在年月日之前可以添加自己想要的符号
+2018-11-02 22:34:27
+[root@lcc ~]# date "+%Y/%m/%d %H:%M:%S"
+2018/11/02 22:34:38
+[root@lcc ~]# date "+%Y%m%d %H:%M:%S"
+20181102 22:35:03
+47.time
+48.man / help
+49.shutdown / init / reboot / poweroff
+50.shutdown -h +10/23:30/now
+51.systemctl set-default multi-user.target  	#默认启动三级别
+52.systemctl set-default graphical.target	#默认启动五级别
+53.systemctl get-default
+
+54.mount /dev/sr0 /media/
+55.rpm -ivh /dedia/Packages/tree-1.6.0-10.el7.x86_64.rpm
+56. tree /tmp/
+
+57.touch / mkdir / mv / vi / rm / cp 
+
+58.stat /etc/passwd	#查看文件属性
+访问时间：atime  查看内容   cat  a.txt
+修改时间：mtime  修改内容  vim a.txt
+改变时间：ctime  文件属性，比如权限  change time。  chmod +x a.sh
+59.touch file{6..20}  /  mkdir -p /tmp/a/b/c
+60.cp /etc/passwd /opt/  /  cp -r /boot/grub /opt/
+61.mv demo01.txt dir1/demo02.txt 
+62.cat / more / less / head / tail
+
+参数:  
+-n 显示文件尾部多少行的内容(n为数字)
+-f  动态显示数据（不关闭）,常用来查看日志
+[root@lcc ~]# tail -n 3 /var/log/secure  #查看最后3行记录
+[root@lcc ~]# tail -f /var/log/secure   #在一个终端执行此命令动态查看文件内容
+[root@lcc ~]# ssh root@192.168.1.63   #在另一个终端远程登录Linux，登录成功后
+[root@lcc ~]# tail -f /var/log/secure  #可以动态查看到登录成功的日志
+
+63.fdisk /dev/sdb 	#指定分区的设备
+   n 	#创建一个新的分区
+   p 	#创建一个主分区
+   +1G  #指定分区大小
+   p	#打印分区表
+   w	#保存
+使用新的分区，格式化分区，并进行挂载
+[root@lcc ~]# mkfs.xfs /dev/sdb1
+[root@lcc ~]# mkdir /sdb1     #创建挂载点
+[root@lcc ~]# mount /dev/sdb1 /sdb1   #挂载
+准备备份测试文件
+[root@lcc ~]# cd /sdb1/
+[root@lcc sdb1]# cp /etc/passwd ./
+[root@lcc sdb1]# mkdir test
+[root@lcc sdb1]# touch test/a
+[root@lcc sdb1]# tree /sdb1/
+[root@lcc sdb1]# tree /sdb1/
+注意：备份的路径这里不能写成/sdb1/。  可以是/dev/sdb1 或/sdb1
+[root@xuegod63 sdb1]# xfsdump -f /opt/dump_sdb1  /dev/sdb1
+-> dump_sdb1  指定备份会话标签
+-> sdb1  指定设备标签，就是对要备份的设备做一个描述
+***指定备份时免交互操作，方便后期做定时备份
+[root@lcc sdb1]# xfsdump -f /opt/dump_passwd /sdb1 -L dump_passwd -M media1
+***参数：-s 文件路径  只对指定的文件进行备份，-s指定时，路径写的是相对路径(-s可以是文件或目录)
+[root@lcc sdb1]# xfsdump -f /opt/dump_grub2 -s grub2/grub.cfg /boot -L dump_grub2 -M boot-sda1
+[root@lcc opt]# xfsdump  -I（字母大写i）
+
+测试恢复：先删除之前创建的内容
+[root@lcc sdb1]# rm -rf ./*
+[root@lcc opt]# xfsrestore -f /opt/dump_sdb1  /sdb1
+恢复单个文件如下：
+[root@lcc ~]# mkdir /var/test/ 
+[root@lcc ~]# xfsrestore -f /opt/dump_grub2 -s grub2/grub.cfg /var/test/
+[root@lcc ~]# xfsrestore -f /opt/dump_grub2 -s grub2 /var/test/  #恢复目录
+
+64.vim   进入编辑模式 a i o  A I O
+说明：
+i 当前字符之前插入 (光标前)
+I 行首插入  (行首)
+a 当前字符之后插入 (光标后)
+A 行尾插入(行尾)
+o下一行插入 (另起一行)
+O上一行插入(上一行插入)
+x 向后删除一个字符		等同于delete
+X 向前删除一个字符     	
+u 撤销一步   每按一次就撤销一次
+r 替换
+多行注释 ctrl+v  按大写的I
+
+调用外部文件或命令
+:!ifconfig	调用系统命令
+!+命令
+读取其他文件。（把其他文件中的内容追加到当前文档中）
+:r /etc/hosts
+:1,3 s/bin/xuegod/g  替换第1到3行中查找到所有的bin进行替换为xuegod
+:% s/do/xuegod/g  	将文本中所有的do替换成xuegod
+:% s/do/xuegod/gi	将文本中所有的do替换成xuegod, 并且忽略do的大小写
+:% s@a@b@g	   将文本中所有的a替换成b
+[root@lcc ~]# cat  /root/.vimrc  
+set nu
+
+vim打开多个文件
+方法1：以上下形势，打开两个文档
+[root@lcc ~]# vim -o /etc/passwd /etc/hosts
+方法2：以左右方式打开两个文档
+[root@lcc ~]# vim -O /etc/passwd /etc/hosts
+注：ctrl+ww  在两文档之间进行切换编辑
+
+比较两个文件内容
+[root@lcc ~]# diff /etc/passwd mima.txt 
+[root@lcc ~]# vimdiff /etc/passwd mima.txt
+
+实战1：在windows中编辑好的汉字文本文档，上传到Linux下打开乱码。
+通过iconv命令转码   没有使用过：1
+参数：
+-f, --from-code=名称 原始文本编码
+-t, --to-code=输出编码
+-o, --output=FILE 输出文件名
+[root@lcc ~]# iconv -f gb2312  -t utf8 a此文件在windows下打开正常-到linux下vim打开是乱码.txt  -o aa.txt
+
+实战2：解决将公司Linux服务器上脚本导到windows上打开串行的问题
+[root@localhost test]# sz b在Linux编辑的文档到windows下没有换行.sh   #发送到本地
+解决方法：
+[root@lcc ~]# rpm -ivh /mnt/Packages/dos2unix-6.0.3-7.el7.x86_64.rpm
+[root@localhost test]# unix2dos b在Linux编辑的文档到windows下没有换行.sh
+
+扩展：
+Linux文件系统由三部分组成：文件名，inode，block
+查看inode号：
+[root@lcc ~]# ls -i a.txt
+
+方法1： 立即断电，然后把磁盘以只读方式，挂载到另一个电脑中进行恢复
+方法2：把extundelete在虚拟机上（虚拟机系统要和服务器版本一样），提前安装好后再复制到U盘中，把U盘插入服务器，恢复时，恢复的文件要保存到U盘中，（不要让恢复的数据写到/下，那样会覆盖之前删除的文件）
+
+install 和cp 有什么区别？ 
+install 复制时可以指定权限  cp不可以
+扩展：ext4文件系统的分区根目录的inode值为2，xfs分区根目录的inode值为64
+[root@lcc test]# ls -id /boot/   #xfs文件系统
+64 /boot/
+
+65.[root@lcc ~]# rpm -ivh /mnt/Packages/zsh-5.0.2-28.el7.x86_64.rpm 
+-i,install              安装软件包
+--nodeps		不验证软件包依赖
+-v,--verbose		提供更多的详细信息输出
+-h,--hash		软件包安装的时候列出哈希标记
+
+Rpm不解决依赖关系 ，方便的解决关系办法：
+66.[root@lc-centos~]# yum install mariadb-server
+rpm相关功能
+rpm –qa...
+
+-a  查询所有已安装的软件包
+-f  查询 文件所属软件包
+-p  查询软件包(通常用来看还未安装的软件包)
+-i  显示软件包信息
+-l 显示软件包中的文件列表
+-d  显示被标注为文档的文件列表
+-c  显示被标注为配置文件的文件列表
+
+通常可以配合管道 | more来使用，使得结果更易读。
+67.[root@lc-centos Packages]# rpm -Uvh lrzsz-0.12.20-36.el7.x86_64.rpm 		#更新包
+68.[root@lc-centos Packages]# rpm -e zsh    	#擦出   如果存在依赖包 需要一一删除
+69.[root@lc-centos Packages]# rpm –e gcc –nodeps  #强制擦出 不推荐
+
+70.YUM
+[root@lc-centos ~]# rm –rf /etc/yum.repo.d/*
+[root@lc-centos ~]# vim /etc/yum.repos.d/rhel7.repo
+[rhel7-yum]			#yum 源名称，唯一的，用来区分不同的yum源
+Name=rhel7-source		#对yum源进行描述信息
+Baseutl=file:///mnt		#yum源的路径（repodata目录所在的目录）
+Enabled=1			#为1，表示启用yum源
+Gpgcheck=0			#为1，使用公钥检验rpm的正确性
+[root@lc-centos~]# yum clean all			#清空yum缓存
+[root@lc-centos~]# yum list				#生成列表
+主要操作：
+1）	安装 yum install –y
+2）	检测升级 yum check-update
+3）	升级 yum updata    #6.9  更新系统（内核也会跟着更新，启动可以指定）
+4）	软件包查询 yum list
+5）	软件包信息 yum info
+
+[root@lc-centos~]# yum info httpd		#显示安装包信息
+
+6）	卸载 yum remove
+[root@lc-centos~]# yum remove httpd –y
+
+71.安装一组安装包
+[root@lc-centos~]# yum grouplist				#查看可安装的组
+[root@lc-centos ~]# yum groupinstall "安全性工具"	-y		#安装，现在支持中文安装
+或
+[root@lc-centos ~]# yum groupinstal  "Security Tools" 
+
+72.源代码包的安装
+1）解压解包
+tar –zxvf 源代码包
+X为解包，z为解压（仅适合gzip，j适合于 bz2），v 显示过程，f指定被解压包名
+2）配置
+进入解压后的目录，用 ./configure [--prefix=/usr/local/filname]来配置，这个过程主要是收集系统信息，设置安装目录等（卸载的时候只需将这个目录删除即可）
+3）编译：把源代码编译可以执行的二进制文件
+make –j 4
+4）安装
+Make install
+
+73.安装nginx服务器
+例：一起安装
+[root@lc-centos~]# yum –y install pcre-devel zlib-devel
+[root@lc-centos~]# useradd –s /sbin/nologin –M nginx (-M为不产生家目录)
+[root@lc-centos~]# tar –zxvf nginx-1.11.2.tar.gz –C /usr/src
+[root@lc-centos~]# cd /usr/src/nginx-1.11.2/
+[root@lc-centos~]# ./configure –prefix=/usr/local/nginx –-user=nginx –-group=nginx
+参数解释：
+--prefix		指定安装的位置
+--use			指定运行的用户
+--group			指定运行的组
+[root@lc-centos~]# echo $?
+0
+[root@lc-centos~]# make –j 4
+安装
+make install
+
+启动nginx并
+/usr/local/nginx/sbin/nginx
+或
+nginx:   #通过cp命令后可以直接执行
+[root@lc-centos nginx-1.11.2~]# cp /usr/local/nginx/sbin/nginx	/usr/sbin/
+[root@lc-centos nginx-1.11.2~]# nginx
+
+[root@lc-centos nginx-1.11.2~]# netstat –anlpt | grep nginx			#查看nginx启动状态
+
+Iptables -L			防火墙列表
+Iptables –F		禁用防火墙
+
+[root@lc-centos nginx-1.11.2~]# nginx –s stop		#关闭
+[root@lc-centos nginx-1.11.2~]# nginx –s start		#开启
+[root@lc-centos nginx-1.11.2~]# nginx –t			#检查
+
+扩展：
+sed -i 's/^efg.*/1234/' a.txt    	替换文件内容
+sed -i "s/zhangsan/lisi/g" `grep zhangsan -rl /home`
+
+74.打包：
+[root@lc-centOS~]# tar cvf grub2.tar /boot/grub2/
+# c creat 创建
+# v 详细
+# f filename
+例：把两个目录或目标+文件打包成一个软件包
+[root@li-cnetOS~]# tar cvf a.tar /root/ /etc/passwd
+不解包，查看tar中的内容：
+操作-解包：
+[root@lc-centos ~]# tar tvf grub2.tar
+
+操作-解压指定路径：
+[root@lc-centos ~]# tar xvf grub2.tar –C /opt/
+
+tar 归档+压缩
+
+gzip bzip2 zip tar
+一、压缩格式：gz，bz2，xz，zip ，Z
+格式（文件名格式）：压缩包.tar.gz 或 压缩名.tgz
+
+语法格式：tar zcvf newfile.tar.zg SOURCE
+对比大小:
+[root@lc-centos ~]# ll –h grub2.tar*
+解压
+[root@lc-centos ~]# tar zxvf grub2.tar.zg –C /opt/
+另一种压缩方法：bz2
+格式（文件名格式）：.tar.bz2
+语法格式：tar jcvf newfile.tar.bz2 SOURCE
+[root@lc-centos ~]# tar jcvf grub2.tar.bz2 /boot/grub2/
+解压：
+[root@lc-centos ~]# tar jxvf grub2.tar.bz2 –C /opt/
+
+zip是压缩程序，unzip是解压程序。
+-r 压缩目录（启用递归）
+[root@lc-centos ~]# zip –r grub2.zip /boot/grub2/
+解压:
+[root@lc-centos ~]# unzip grub2.zip –d /opt/
+************************
+1.	用户和组的相关配置文件
+2.	Linux进程管理
+3.	Ps top pgrep 工具的使用方式
+4.	进程的优先级管理
+5.	文件查找方法
+6.	Linux中计划任务
+75.[root@lc-centos ~]# ps -aux | grep httpd 或 ps -aux
+   [root@lc-centos ~]# top		#top 动态查看进程
+空格：立即刷新
+q	推出
+M	按内存排序
+P	按CPU排序
+一个存放内存中的特殊目录 /proc
+76.关闭进程：
+kill 9 [进程号]  （强行关闭）
+结束所有进程：killall
+
+77.nice –n command    # nice指定程序的运行优先级
+
+[root@lc-centos ~]# free -m		#扩展：free –m    #查看系统内存
+
+78.文件查找办法 which  grep  find
+举例：
+find ./ -name “*.txt”
+[root@lc-centos ~]# find /root/ -mtime -5 / +3 	#更改时间在5日以内的文件 / 在3日以前
+
+79.[root@lc-centos ~]# ls /usr/lib/systemd/system   #服务所在目录
+at # 只能执行一次
+[root@lc-centos ~]# systemctl status atd 	查看atd服务的名称
+实战 使用at创建计划任务:
+[root@lc-centos ~]# at 22:30		#查看当前的时间
+at> mkdir /root/linux1712		#输入要执行的命令
+at> <EOT>				#按ctrl+D结束
+[root@lc-centos ~]# at –l		#查看计划任务
+[root@lc-centos ~]# at 20:00 2016-10-1    在某天
+[root@lc-centos ~]# at now +10min    在10分钟后执行
+删除at计划任务：
+格式：atrm   + 计划任务的编号
+
+80.1.系统级别 2.用户级别的计划任务
+
+主文件： /etc/crntab
+[root@lc-centos ~]# vim /etc/crontab    （内容说明）
+*   *   *    *   *
+分  时  日  月  星 
+
+[root@lc-centos ~]# systemctl status crond    （查看crond服务的状态）
+
+针对用户级别的计划任务：
+对于root用户：
+命令：
+# crontab -e	创建一个计划任务
+# crontab -l	显示	
+# crontab -r	删除计划任务
+
+#crontab -e	#写法
+分 时 日 月 星 谁做后面的事情 命令
+每个取值范围：
+分：0-59
+小时：0-23
+日：1-31
+月1-12
+周：0-7 		0 7都是周日
+
+例：#每个月9，18，22号这几天的凌晨1点1分，执行一个备份脚本
+
+[root@lc-centos ~]# crontab -e
+[root@lc-centos ~]# crontab -l
+1 1 9,18,22 * * /root/backup.sh
+
+#每月9-22号这几天的凌晨1点1分执行一个备份脚本
+1 1 9-22 * * /root/backup.sh
+#每5分钟，执行一次：
+*/5 * * * * /root/backup.sh
+
+81.anacron    默认有系统已开
+******************************以上见word笔记"1-7"
+
+  没有最终的成功  也没有致命的失败
+最可贵的是继续前进的勇气 -- 温斯顿·丘吉尔
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

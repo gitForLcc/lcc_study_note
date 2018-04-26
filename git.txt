@@ -1,0 +1,332 @@
+git status   #查看git仓库状态
+git status   #查看git仓库状态
+
+git diff     #工作区和暂存区的不同
+
+git diff HEAD      #工作目录和本地仓库的不同
+
+git diff --cached      #暂存区和本地仓库的不同
+
+git rm --cached 文件名      #从暂存区中移除
+
+git log / git log --oneline    #查看提交历史
+
+git commit --allow-empty -m '空的提交'      #这样才允许空提交
+
+1.安装git       SourceTree  一个git图形化软件，目录打开后拖到软件左边栏
+
+  创建github仓库（编写README文件等）
+
+  复制仓库地址：https://github.com/gitForLcc/test.git
+
+  文件根目录下执行：git clone https://github.com/gitForLcc/test.git
+
+  git add a.txt
+
+  git commit
+
+  git push    #此时已经传到远程git仓库  
+	当只在本地创建分支需要上库时，默认远程没有这个分支，是不允许的，需执行： git push --set-upstream origin dev2   #表示远程创建分支并上传
+
+  git pull    #将远程仓库中的代码下载到本地
+  git pull origin dev 本地分支与远程分支相关联
+
+2.git init   #同时产生一个文件库（.git隐藏文件）
+
+3.git config --global user.name 'Li Cheng'
+
+  git cinfig --global user.email '123@qq.com'
+
+  保存在家目录下.gitconfig文件中
+
+4.git配置文件一个在家目录下的全局配置文件（--global），一个在.git隐藏文件中的config中。
+
+  有的在/etc/下也有配置文件
+
+5.git中有三个区域。分别是Repository，Working directory，Staging area / Index
+
+	1.Repository  #git inti创建，代码仓库，默认名字为.git
+
+	2.Working directory    #工作区，文件当前目录
+
+	3.Staging area    #待处理区
+
+6.git add main.c    #添加到待处理区，添加后.git文件中多出来一个index文件
+
+7.git commit -m "Init Project"      #添加到仓库
+
+8.git checkout -f HEAD      #从仓库中检索出已保存版本代码
+
+扩展：任何一个文件经过hash 中的sha1算法生成一串20个字节（40位）的字符串
+
+Blob object    #叶子节点，真正保存数据
+
+Tree object    #包括对象类型，hash值，文件名字等
+
+Commit object  #包括hash，tree，blob，作者等
+
+1.git hash-object main.c    #获取文件的hash值
+
+2.git add .     #后通过ls -l .git/objects/查看hash值的前两位形成的文件，里面有hash值得后面38位
+
+3.git commit -m "1 commit"    #后通过ls -l .git/objects/查看，共三个hash文件
+
+  find .git/objects/ -type f   #列出普通文件（不是链接等）
+
+4.git show fc047f  #通过hash前几位读取数据,其中包括commit的hash值，merge的分支hash值，作者，日期等
+
+  git cat-file -t 0593 通过hash前几位查看文件类型（blob tree commit）
+
+  git ls-tree 0593    #查看tree文件中的内容    git ls-tree master 查看commit中的内容
+
+*blob中只保存数据，不保存文件名字，tree中保存文件名字
+
+总结：每一个commit对象指向tree对象，tree对象指向tree对象或blob对象
+
+      git commit -a -m "2 commit"     #快捷键，表示当前目录所有文件commit到仓库    XXX实践不好使
+
+      find .git/objects/ -type f | wc -l   #查看find的条数
+
+      修改文件，对象只创建追加，不做修改，未修改的blob对象可以继续引用
+
+      
+HEAD指向最新的commit
+
+References    #引用
+	git对象一旦创建，不可改变
+        references就像一个标签，可以移动
+	a)Branches
+	b)HEAD
+	c)Remote brabches
+
+tag对象    
+	#轻量级的：打一个tag创建一个文本文件，hash字符串，类型commit，就是一个指针，不占对象
+
+	ls -l .git/refs/tags     #tag存放的位置  
+	
+	git tag v1.0
+
+	#对象级的：打一个tag创建一个文本文件，hash字符串，类型commit，就是一个指针，同时创建一个tag对象
+
+	git tag -a milestone1.0 -m "This is the stable version"
+
+通过tag提取数据并打包压缩：
+
+	git archive --format=tar --prefix=ruby/ v1.0 | gzip > /tmp/ruby1.0.tar.gz
+
+	   把...存档		格式		前缀	tag	压缩	     目标文件
+
+解压：tar zxvf ruby1.0.tar.gz
+
+分支
+git branch    #查看分支   初始一个master分支    *号表示当前活动分支
+
+git branch -a   #可以查看本地和远程的分支
+
+git branch testing    #基于当前commit对象创建testing分支
+
+git checkout testing  #选择分支，同时环境跟着改变
+
+合并分支：    #合并可能导致冲突
+
+git checkout mastar   #切换到将要合并到的分支
+
+git checkout -b bug_11    #创建分支并切换
+
+git checkout -b b master    #在master分支中创建b分支并切换
+
+git merge testing     #合并testing分支到master
+
+git branch -D testing    #删除没用的分支
+
+查看当前分支：
+git log --oneline --decorate
+
+
+与前面学习接上：
+
+切换分支的时候对应的文件系统也随之发生改变，HEAD随之改变
+
+之前创建分支：git branch dev 后面省略了 commithash，相当于当前分支所在的提交进行创建
+
+git commit --allow-empty -m '功能1'
+git commit --allow-empty -m '功能2'
+
+实例：仓库中有master分支，同时已经提交两次commit，现在发现master分支代码有bug
+
+git branch bug_22 （master 或 hash值） 基于master分支创建分支
+
+git checkout bug_22      #切换到分支
+
+git log --oneline --all --decorate     #查看全部分支
+
+git commit --allow-empty -m '修改bug_22'
+
+git log --oneline --all --decorate --graph     #图形界面显示分支结构，更加直观
+
+git config alias.logg "log --oneline --all --decorate --graph"
+
+git logg    #通过上面自定义方法 可以同样显示图形界面
+
+******
+git ls-files -s    #查看当前暂存区的内容（hash值，文件名）
+
+git cat-file -p :b    #查看暂存区b文件的内容
+
+git cat-file -p b:b    #查看commit中b分支的b文件内容，其中第一个可以是分支所对应的hash值
+
+git ls-tree b      #查看分支b中暂存区的内容
+
+git checkout .    #当前暂存区中的内容覆盖工作区    或 git checkout --filename    #来指定文件
+
+git checkout HEAD .    #当前commit区中的内容覆盖工作区和暂存区      或 git checkout HEAD 分支名   #来指定替换的分支 
+
+stash命令：  对工作区文件进行修改但没有commit，在切换分支时会报错，提示工作区 内容会被覆盖
+
+git stash    #将工作区和暂存区的修改暂时存储到一个地方，此时可以切换分支    *可以stash很多次，其中0代表最近的一次
+
+git stash list    #查看暂存了哪些内容
+
+git stash show -p stash@{0}    #查看对应内容修改
+
+git stash pop  或  git stash pop stash@{0/n}     #弹出最近一次修改的内容进行覆盖（应用并且删除stash）
+
+git stash apply   或  git stash apply stash@{0/n}    #弹出最近一次修改的内容进行覆盖（不删除stash）
+
+git stash drop stash@{0/n}    #删除stash存储，默认是0
+
+**处理merge分支冲突问题（confilict）   用到的软件是：BeyondCompare
+
+git config --global merge.tool bc
+
+git config --global mergetool.bc.path "添加位置变量"
+
+git mergetool      #进入图形化界面进行修改，右击可以进行对应修改。git进行merge后产生.orig文件，内容为mergetool前内容，确定没有问题后可将其删掉
+
+git commit -m "合并某某分支"
+
+**git reset  #能重置分支到某个提交,后续还有
+
+git reset --hard 93df(hash值)    #可以回退到merge之前
+
+**使用IDEA软件管理git （IntelliJ IDEA）     #使用软件进行管理时会生成.idea文件，需将其在git中忽略
+	
+	软件中log为commit树形结构，
+	右下角可以切换分支，
+	一般Ctrl+k 可以进行提交，
+	合并分支：右键根目录->git->Repository->Merge Changes...->选上分支
+
+  不打算让git管理的文件，可以写到.gitignore文件里
+
+  编写.gitignor文件：
+  
+  #下文中的“当前目录”是指.gitignor文件所在的目录
+  #所有路径下的文件、文件夹
+  .idea
+  #所有路径下iml后缀的文件
+  *.iml
+  #仅当前目录下一层目录下的target目录及其内容
+  /*/target
+  #去除jrebel
+  rebel.xml
+
+  **rebase  （中文：变基）
+	merge为合并后再创建一个commit    rebase为应用集合到当前分支，相当于将分支接到当前分支后面
+  git rebase --onto newbase start branch    #(后面三个为分支名称或hash值)
+
+  git rebase --onto master master dev    #将dev分支rebase到master分支上并且基于master和dev的差值
+	分别执行：
+		1.切换分支  git checkout branch
+		2.计算差值（branch-start）
+			dev:c5,c4,c1,c0
+			master:c3,c2,c1,c0
+			dev-master:c5,c4
+		3.重置分支  执行reset --hard
+		4.应用合集到当前分支
+扩展：
+git rebase [--onto newbase] start [branch]
+	省略-- onto newbase    #缺省的默认值：start一致
+	省略  branch      #缺省默认值：HEAD
+
+常用的格式：
+
+1.保证当前在dev分支
+2.git rebase master
+3.git checkout master
+4.git merge dev
+
+扩展：在git rebase的时候产生分支冲突应该怎么办**************************************
+
+总结：merge和rebasse最后的结果是一样的，但是提交树是不同的，rebase更加干净。
+      在远程连接了远程仓库时不要使用rebase，因为push分支远程仓库是能看见的，有人在对之前的分支进行修改，推送时又会把分支推送上去，实现不了简洁树
+
+**git fetch    #获取远程改变，此时远程分支已经改变提交，但是本地的还没
+
+git merge origin/master    #把远程的merge到本地
+
+总结：git fetch 获取远程仓库后没有merge，git pull 获取远程仓库后自动执行merge
+
+**git branch -vv    #查看跟踪分支
+	推送和下载取决于跟踪分支之间的联系，其信息保存在.git/config中
+	origin为远程分支，remote为远程仓库...
+
+**git reset    # 重置暂存区 将commit覆盖暂存区
+
+常见格式：
+
+git reset chash -- [.|file Name]    # 默认选项是mixed   chash是可以省略的，默认是HEAD
+
+git reset --soft chash   或 git reset --soft master^ (表示master的上一次提交)    #更新分支的commit值，值不更新暂存区和工作区，可用于提交时说明错误修改
+
+git reset --mixed chash    #更新分支的commit，重置暂存区，不重置工作目录
+
+git reset --hard chash    #重置分支的commit值，重置暂存区，重置工作目录     用于回滚到某个commit
+
+扩展：
+git commit --amend -m "c1"    #也可以对提交说明进行修改
+
+**交互式的rebase     交互过程中有很多选项，r修改说明，e可以添加修改文件，s可以合并提交说明，f也是合并说明并丢弃前几个说明
+	push上去的最好别rebase
+git rebase -i --onto master master dev
+
+**cherry-pick    #将修改应用到分支上，相当于加了一个文件
+
+git cherry-pick hash值    
+
+**revert    #可以对commit进行修改，相当与反向操作，可用于平时错误提交
+
+git revert hash值    #可撤销某个commit，试用没有merge后的commit，merge后撤销会报错，因为无法确定回退到哪个分支
+
+git revert -m n merge后的hash值    #其中n表示merge时的分支hash值，通过 git show hash值  #查看，1表示第一个，2表示第二个....
+	回退到merge前的分支n
+实例：master和dev分支进行合并后继续修改发现dev分支上有问题，所以进行revert产生新的commit，同时新的commit进行了新的修改commit，同时dev分支进行了新的修改commit，此时在进行合并时，新的commit上并没有dev分支之前的提交
+
+方案1：对revert后的提交在进行revert，相当于引入之前的dev分支commit后再合并
+
+方案2：把dev rebase为新的commit，在合并到master（自理解：是平行变基，并不是变基到master上）
+
+方案3：cherry-pick 把dev分支cherry-pick到master上
+
+
+总结：revert对merge使用时，需要指定主线，另外一个分支上的commit数据将不会显示
+      revert只改变数据，不会改变历史
+      revert时主线上的commit都会存在，不管先后
+      已经推送到线上的项目进行反向操作、撤销操作时，经常使用revert，而reset会产生一些不好的后果
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
